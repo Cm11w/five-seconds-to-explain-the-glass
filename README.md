@@ -28,6 +28,26 @@ The cat's defence is pure denial with a lawyer's hedge: the broken glass was onl
 node main.ts
 ```
 
+## Verifying the output
+
+After the run, `/output/entry.txt` contains exactly the line above — no trailing newline:
+
+```sh
+cat /output/entry.txt
+# That wasn't the glass — that was its stunt double, and the real one is safe in the cupboard, so nothing you love was harmed, technically.
+```
+
+The character count and the byte count differ: the line is 137 characters but 139 bytes, because the em dash (—) is 3 bytes in UTF-8. Check both, plus the checksum, with:
+
+```sh
+python3 -c "print(len(open('/output/entry.txt', encoding='utf-8').read()))"  # 137
+wc -c /output/entry.txt                                                       # 139
+sha256sum /output/entry.txt
+# ae61dcde2910ffac4c8f6d9cd2b51c2af4a1a12cd6bad8af227c99689b82e9f6
+```
+
+The gate guard in `main.ts` enforces five checks before anything is written: 1–200 characters, a single line (no `\n` or `\r`), not whitespace-only, no leading or trailing whitespace, and a single sentence ending in a period. A failed check throws and no file is written, so a stale or invalid `/output/entry.txt` can never be left behind by a bad run.
+
 ## QA
 
 - Ran `main.ts` twice; both runs byte-identical.
